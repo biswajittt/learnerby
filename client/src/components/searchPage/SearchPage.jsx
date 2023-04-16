@@ -1,8 +1,9 @@
 import { styled, Avatar, Box, Card, CardContent, Chip, Grid, Paper, Rating, Skeleton, Stack, Typography } from '@mui/material'
-import React from 'react'
+import React, { useEffect } from 'react'
 import logo from "../searchPage/mentor.jpg"
 import { useSelector, useDispatch } from 'react-redux';
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
+import { getMentorsDataBySearchQuery } from "../../redux/actions/index"
 
 
 const SearchPageContainer = styled(Box)`
@@ -31,6 +32,10 @@ const MentorDetailsCard = styled(Paper)(({ theme }) => ({
     },
     [theme.breakpoints.down(427)]: {
         height: '401px',
+        marginBottom: '17px'
+    },
+    [theme.breakpoints.down(293)]: {
+        marginRight: '0px'
     },
 }));
 const MentorProfileImageContainer = styled(Box)(({ theme }) => ({
@@ -97,28 +102,38 @@ const MentorDetailsCardContainerMentorPrice = styled(Stack)(({ theme }) => ({
         marginTop: '50px'
     },
     [theme.breakpoints.down(427)]: {
-        marginTop: '50px'
+        marginTop: '7px'
     },
 }));
 export default function SearchPage() {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const mentors = useSelector((state) => state.getMentorsDataBySearchQueryReducers)
-    // console.log("from sp: ", mentors.mentor)
+
+    const { searchquery } = useParams()
+
+    console.log(searchquery)
+    useEffect(() => {
+        dispatch(getMentorsDataBySearchQuery(searchquery))
+    }, [dispatch])
+
+    const { loading, mentor } = useSelector((state) => state.getMentorsDataBySearchQueryReducers)
+    // console.log("from sp: ", mentor)
 
     // const loadMentorDetailsPage = (mentorId) => {
     //     console.log('clicked')
     //     navigate(`/mentordetails/${mentorId}`)
     // }
+    console.log(loading)
+
     return (
         <SearchPageContainer>
             {
-                (typeof mentors.mentor != 'undefined' && mentors.mentor.length > 0) ?
+                (typeof mentor != 'undefined' && mentor.length > 0) ?
                     <Box style={{ display: 'flex', justifyContent: 'center' }}>
                         <Stack spacing={2}>
                             {
-                                mentors.mentor.map((data, index) => (
+                                mentor.map((data, index) => (
                                     <Link to={`/mentordetails/${data._id}`} style={{ textDecoration: 'none' }}>
                                         <MentorDetailsCard key={index} >
                                             <CardContent>
@@ -176,114 +191,122 @@ export default function SearchPage() {
 
                         </Stack>
                     </Box> :
+
                     <Box style={{ display: 'flex', justifyContent: 'center' }}>
-                        <Stack spacing={2}>
-                            <MentorDetailsCard sx={{ width: '850px', height: '200px' }} >
-                                <CardContent>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={9}>
-                                            <Stack direction='row' spacing={2}>
-                                                <Box>
-                                                    <MentorProfileImage variant="rounded">
-                                                        <Skeleton variant="rounded" width='inherit' height='inherit' />
-                                                    </MentorProfileImage>
-                                                </Box>
-                                                <Box>
-                                                    <Stack direction='column'>
-                                                        <Skeleton variant="text" sx={{ fontSize: '1.25rem', marginBottom: '8px' }} />
-                                                        <Skeleton variant="text" sx={{ fontSize: '0.75rem', marginBottom: '8px' }} />
-                                                        <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                        {
+                            (loading == false) ?
+                                <Typography
+                                    sx={{ marginTop: '216px', fontWeight: 'bold', fontSize: '17px' }}
+                                >No Data Found</Typography> :
+                                <Stack spacing={2}>
+                                    <MentorDetailsCard sx={{ width: '850px', height: '200px' }} >
+                                        <CardContent>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={9}>
+                                                    <Stack direction='row' spacing={2}>
+                                                        <Box>
+                                                            <MentorProfileImage variant="rounded">
+                                                                <Skeleton variant="rounded" width='inherit' height='inherit' />
+                                                            </MentorProfileImage>
+                                                        </Box>
+                                                        <Box>
+                                                            <Stack direction='column'>
+                                                                <Skeleton variant="text" sx={{ fontSize: '1.25rem', marginBottom: '8px' }} />
+                                                                <Skeleton variant="text" sx={{ fontSize: '0.75rem', marginBottom: '8px' }} />
+                                                                <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                                                                <Stack direction='row' spacing={2} sx={{ margin: '4px 0 0 8px' }}>
+                                                                    <Skeleton variant="rounded" width={66} height={25} />
+                                                                    <Skeleton variant="rounded" width={66} height={25} />
+                                                                </Stack>
+                                                            </Stack>
+                                                        </Box>
+                                                    </Stack>
+                                                </Grid>
+                                                <Grid item xs={3}>
+                                                    <Stack spacing={15}>
+                                                        <Skeleton variant="rounded" width={150} height={18} />
                                                         <Stack direction='row' spacing={2} sx={{ margin: '4px 0 0 8px' }}>
                                                             <Skeleton variant="rounded" width={66} height={25} />
                                                             <Skeleton variant="rounded" width={66} height={25} />
                                                         </Stack>
                                                     </Stack>
-                                                </Box>
-                                            </Stack>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Stack spacing={15}>
-                                                <Skeleton variant="rounded" width={150} height={18} />
-                                                <Stack direction='row' spacing={2} sx={{ margin: '4px 0 0 8px' }}>
-                                                    <Skeleton variant="rounded" width={66} height={25} />
-                                                    <Skeleton variant="rounded" width={66} height={25} />
-                                                </Stack>
-                                            </Stack>
-                                        </Grid>
-                                    </Grid>
-                                </CardContent>
-                            </MentorDetailsCard>
-                            <MentorDetailsCard sx={{ width: '850px', height: '200px' }} >
-                                <CardContent>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={9}>
-                                            <Stack direction='row' spacing={2}>
-                                                <Box>
-                                                    <MentorProfileImage variant="rounded">
-                                                        <Skeleton variant="rounded" width='inherit' height='inherit' />
-                                                    </MentorProfileImage>
-                                                </Box>
-                                                <Box>
-                                                    <Stack direction='column'>
-                                                        <Skeleton variant="text" sx={{ fontSize: '1.25rem', marginBottom: '8px' }} />
-                                                        <Skeleton variant="text" sx={{ fontSize: '0.75rem', marginBottom: '8px' }} />
-                                                        <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                                                </Grid>
+                                            </Grid>
+                                        </CardContent>
+                                    </MentorDetailsCard>
+                                    <MentorDetailsCard sx={{ width: '850px', height: '200px' }} >
+                                        <CardContent>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={9}>
+                                                    <Stack direction='row' spacing={2}>
+                                                        <Box>
+                                                            <MentorProfileImage variant="rounded">
+                                                                <Skeleton variant="rounded" width='inherit' height='inherit' />
+                                                            </MentorProfileImage>
+                                                        </Box>
+                                                        <Box>
+                                                            <Stack direction='column'>
+                                                                <Skeleton variant="text" sx={{ fontSize: '1.25rem', marginBottom: '8px' }} />
+                                                                <Skeleton variant="text" sx={{ fontSize: '0.75rem', marginBottom: '8px' }} />
+                                                                <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                                                                <Stack direction='row' spacing={2} sx={{ margin: '4px 0 0 8px' }}>
+                                                                    <Skeleton variant="rounded" width={66} height={25} />
+                                                                    <Skeleton variant="rounded" width={66} height={25} />
+                                                                </Stack>
+                                                            </Stack>
+                                                        </Box>
+                                                    </Stack>
+                                                </Grid>
+                                                <Grid item xs={3}>
+                                                    <Stack spacing={15}>
+                                                        <Skeleton variant="rounded" width={150} height={18} />
                                                         <Stack direction='row' spacing={2} sx={{ margin: '4px 0 0 8px' }}>
                                                             <Skeleton variant="rounded" width={66} height={25} />
                                                             <Skeleton variant="rounded" width={66} height={25} />
                                                         </Stack>
                                                     </Stack>
-                                                </Box>
-                                            </Stack>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Stack spacing={15}>
-                                                <Skeleton variant="rounded" width={150} height={18} />
-                                                <Stack direction='row' spacing={2} sx={{ margin: '4px 0 0 8px' }}>
-                                                    <Skeleton variant="rounded" width={66} height={25} />
-                                                    <Skeleton variant="rounded" width={66} height={25} />
-                                                </Stack>
-                                            </Stack>
-                                        </Grid>
-                                    </Grid>
-                                </CardContent>
-                            </MentorDetailsCard>
-                            <MentorDetailsCard sx={{ width: '850px', height: '200px' }} >
-                                <CardContent>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={9}>
-                                            <Stack direction='row' spacing={2}>
-                                                <Box>
-                                                    <MentorProfileImage variant="rounded">
-                                                        <Skeleton variant="rounded" width='inherit' height='inherit' />
-                                                    </MentorProfileImage>
-                                                </Box>
-                                                <Box>
-                                                    <Stack direction='column'>
-                                                        <Skeleton variant="text" sx={{ fontSize: '1.25rem', marginBottom: '8px' }} />
-                                                        <Skeleton variant="text" sx={{ fontSize: '0.75rem', marginBottom: '8px' }} />
-                                                        <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                                                </Grid>
+                                            </Grid>
+                                        </CardContent>
+                                    </MentorDetailsCard>
+                                    <MentorDetailsCard sx={{ width: '850px', height: '200px' }} >
+                                        <CardContent>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={9}>
+                                                    <Stack direction='row' spacing={2}>
+                                                        <Box>
+                                                            <MentorProfileImage variant="rounded">
+                                                                <Skeleton variant="rounded" width='inherit' height='inherit' />
+                                                            </MentorProfileImage>
+                                                        </Box>
+                                                        <Box>
+                                                            <Stack direction='column'>
+                                                                <Skeleton variant="text" sx={{ fontSize: '1.25rem', marginBottom: '8px' }} />
+                                                                <Skeleton variant="text" sx={{ fontSize: '0.75rem', marginBottom: '8px' }} />
+                                                                <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                                                                <Stack direction='row' spacing={2} sx={{ margin: '4px 0 0 8px' }}>
+                                                                    <Skeleton variant="rounded" width={66} height={25} />
+                                                                    <Skeleton variant="rounded" width={66} height={25} />
+                                                                </Stack>
+                                                            </Stack>
+                                                        </Box>
+                                                    </Stack>
+                                                </Grid>
+                                                <Grid item xs={3}>
+                                                    <Stack spacing={15}>
+                                                        <Skeleton variant="rounded" width={150} height={18} />
                                                         <Stack direction='row' spacing={2} sx={{ margin: '4px 0 0 8px' }}>
                                                             <Skeleton variant="rounded" width={66} height={25} />
                                                             <Skeleton variant="rounded" width={66} height={25} />
                                                         </Stack>
                                                     </Stack>
-                                                </Box>
-                                            </Stack>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Stack spacing={15}>
-                                                <Skeleton variant="rounded" width={150} height={18} />
-                                                <Stack direction='row' spacing={2} sx={{ margin: '4px 0 0 8px' }}>
-                                                    <Skeleton variant="rounded" width={66} height={25} />
-                                                    <Skeleton variant="rounded" width={66} height={25} />
-                                                </Stack>
-                                            </Stack>
-                                        </Grid>
-                                    </Grid>
-                                </CardContent>
-                            </MentorDetailsCard>
-                        </Stack>
+                                                </Grid>
+                                            </Grid>
+                                        </CardContent>
+                                    </MentorDetailsCard>
+                                </Stack>
+                        }
+
                     </Box>
             }
         </SearchPageContainer>

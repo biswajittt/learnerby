@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import SearchIcon from '@mui/icons-material/Search';
-import { styled, InputBase, Button, alpha, Box, createTheme, Stack } from "@mui/material";
+import { styled, InputBase, Button, alpha, Box, createTheme, Stack, Typography } from "@mui/material";
 
 import { useSelector, useDispatch } from 'react-redux';
 import { getMentorsDataBySearchQuery } from '../../redux/actions/index';
@@ -69,6 +69,9 @@ const Search = styled('div')(({ theme }) => ({
     [theme.breakpoints.down(719)]: {
         width: '290px',
     },
+    [theme.breakpoints.down(646)]: {
+        width: '379px',
+    },
     [theme.breakpoints.down(488)]: {
         width: '252px',
     },
@@ -76,7 +79,33 @@ const Search = styled('div')(({ theme }) => ({
         marginLeft: '0px'
     },
     [theme.breakpoints.down(421)]: {
-        width: '220px',
+        width: '260px',
+    },
+    [theme.breakpoints.down(407)]: {
+        width: '250px',
+    },
+    [theme.breakpoints.down(399)]: {
+        width: '243px',
+    },
+    [theme.breakpoints.down(387)]: {
+        width: '237px',
+    },
+    [theme.breakpoints.down(356)]: {
+        width: '229px',
+    },
+    [theme.breakpoints.down(347)]: {
+        width: '223px',
+    },
+    [theme.breakpoints.down(340)]: {
+        width: '216px',
+    },
+    [theme.breakpoints.down(333)]: {
+        width: '212px',
+    },
+    [theme.breakpoints.down(331)]: {
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'space-between'
     },
 }));
 
@@ -119,18 +148,96 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     [theme.breakpoints.down('md')]: {
         width: '344px',
     },
+    [theme.breakpoints.down(849)]: {
+        width: '325px',
+    },
+    [theme.breakpoints.down(827)]: {
+        width: '314px',
+    },
+    [theme.breakpoints.down(818)]: {
+        width: '307px',
+    },
+    [theme.breakpoints.down(811)]: {
+        width: '296px',
+    },
     [theme.breakpoints.down(796)]: {
         width: '270px',
+    },
+    [theme.breakpoints.down(771)]: {
+        width: '257px',
+    },
+    [theme.breakpoints.down(756)]: {
+        width: '245px',
+    },
+    [theme.breakpoints.down(746)]: {
+        width: '237px',
+    },
+    [theme.breakpoints.down(734)]: {
+        width: '225px',
+    },
+    [theme.breakpoints.down(723)]: {
+        width: '216px',
     },
     [theme.breakpoints.down(719)]: {
         width: '205px',
     },
-    [theme.breakpoints.down(488)]: {
-        width: '168px',
+    [theme.breakpoints.down(702)]: {
+        width: '193px',
+    },
+    [theme.breakpoints.down(690)]: {
+        width: '179px',
+    },
+    [theme.breakpoints.down(646)]: {
+        width: '300px',
+    },
+    [theme.breakpoints.down(609)]: {
+        width: '285px',
+    },
+    [theme.breakpoints.down(581)]: {
+        width: '274px',
+    },
+    [theme.breakpoints.down(571)]: {
+        width: '265px',
+    },
+    [theme.breakpoints.down(561)]: {
+        width: '255px',
+    },
+    [theme.breakpoints.down(549)]: {
+        width: '240px',
+    },
+    [theme.breakpoints.down(534)]: {
+        width: '225px',
+    },
+    [theme.breakpoints.down(518)]: {
+        width: '210px',
+    },
+    [theme.breakpoints.down(503)]: {
+        width: '198px',
+    },
+    [theme.breakpoints.down(491)]: {
+        width: '170px',
+    },
+    [theme.breakpoints.down(451)]: {
+        width: '159px',
     },
     [theme.breakpoints.down(421)]: {
-        width: '137px',
+        width: '168px',
     },
+    [theme.breakpoints.down(399)]: {
+        width: '156px',
+    },
+    [theme.breakpoints.down(356)]: {
+        width: '145px',
+    },
+    [theme.breakpoints.down(334)]: {
+        width: '136px',
+    },
+    // [theme.breakpoints.down(488)]: {
+    //     width: '168px',
+    // },
+    // [theme.breakpoints.down(421)]: {
+    //     width: '137px',
+    // },
 }));
 
 
@@ -179,7 +286,7 @@ export default function SearchBar() {
         // console.log(typeof searchQuery.searchquery)
         if (typeof searchQuery.searchquery != 'undefined' && searchQuery.searchquery.length > 0 && searchQuery.searchquery != "" && searchQuery.searchquery != " ") {
             navigate(`/searchpage/searchquery/${searchQuery['searchquery']}`)
-            dispatch(getMentorsDataBySearchQuery(searchQuery))
+            dispatch(getMentorsDataBySearchQuery(searchQuery['searchquery']))
         } else {
             console.log("search query is empty")
         }
@@ -197,13 +304,35 @@ export default function SearchBar() {
             <SearchIconWrapper>
                 <SearchIcon />
             </SearchIconWrapper>
-            <StyledInputBase placeholder='Search' name='searchquery' inputProps={{ 'aria-label': 'search' }} onChange={getSearchQuery} />
+            <StyledInputBase placeholder='Search' name='searchquery' inputProps={{ 'aria-label': 'search' }} onChange={getSearchQuery} autoComplete="off" />
 
             {
                 (typeof searchQuery.searchquery != 'undefined' && searchQuery.searchquery != '' && searchQuery.searchquery.length > 0) ?
-                    <Button variant="contained" justifyContent="end" size='small' sx={{ borderRadius: '17px', background: '#262626' }} onClick={handleSearch}>Search</Button> :
+                    <Button variant="contained" justifyContent="end" size='small' sx={{ borderRadius: '17px', background: '#262626' }} onClick={handleSearch}>
+                        <Typography
+                            sx={(theme) => ({
+                                fontSize: '13px',
+                                [theme.breakpoints.down(342)]: {
+                                    fontSize: '12px'
+                                },
+                            })}
+                        >
+                            Search
+                        </Typography>
+                    </Button> :
 
-                    <Button variant="contained" size='small' sx={{ borderRadius: '17px', background: '#262626' }} disabled>Search</Button>
+                    <Button variant="contained" size='small' sx={{ borderRadius: '17px', background: '#262626' }} disabled>
+                        <Typography
+                            sx={(theme) => ({
+                                fontSize: '13px',
+                                [theme.breakpoints.down(342)]: {
+                                    fontSize: '12px'
+                                },
+                            })}
+                        >
+                            Search
+                        </Typography>
+                    </Button>
 
                 // <Link to={`/searchpage/searchquery/${searchQuery['searchquery']}`} style={{ textDecoration: 'none' }}>
                 //     <Button variant="contained" size='small' onClick={handleSearch} sx={{ borderRadius: '17px', background: '#262626' }}>Search</Button>

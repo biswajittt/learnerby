@@ -33,10 +33,28 @@ const CustomButtonInSmallScreen = styled(Box)(({ theme }) => ({
     }
 }))
 const MenuButton = styled(Button)(({ theme }) => ({
+    display: 'block',
     [theme.breakpoints.down(421)]: {
         marginLeft: '-17px'
     },
+    [theme.breakpoints.down(331)]: {
+        display: 'none',
+    },
 }))
+const DashBoardText = styled(Typography)(({ theme }) => ({
+    fontWeight: '600',
+    color: 'black',
+    fontSize: '15px',
+    [theme.breakpoints.down(491)]: {
+        fontSize: '13px',
+    },
+    [theme.breakpoints.down(421)]: {
+        fontSize: '10px',
+        fontWeight: 'bold',
+    },
+}))
+
+
 
 export default function CustomeButton() {
     const navigate = useNavigate()
@@ -60,7 +78,7 @@ export default function CustomeButton() {
     const openMentorLoginDialog = () => {
         setMentorLoginDialog(true);
     }
-    const category = localStorage.getItem('category')
+    // const category = localStorage.getItem('category')
     const retrievedData = localStorage.getItem('accountHolderData')
 
     const accountHolderProfileData = JSON.parse(retrievedData)
@@ -69,19 +87,35 @@ export default function CustomeButton() {
 
     const loadProfilePage = () => {
         if (accountHolderProfileData.category == 'mentor') {
-            navigate(`/profile/mentor/${accountHolderProfileData._id}`)
+            navigate(`/mentor/dashboard/${accountHolderProfileData._id}`)
         } else {
-            navigate(`/profile/mentor/${accountHolderProfileData._id}`)
+            navigate(`/student/dashboard/${accountHolderProfileData._id}`)
         }
 
         handleClose();
     }
 
     const logout = () => {
-        localStorage.removeItem("accountHolderData");
-        // localStorage.removeItem("category");
-        handleClose();
-        navigate('/');
+        if (localStorage.getItem('accountHolderData')) {
+            const accountHolderProfileData = JSON.parse(retrievedData)
+            if (accountHolderProfileData.category == 'mentor') {
+                localStorage.removeItem("accountHolderData");
+                localStorage.removeItem("bookedClasses");
+                // localStorage.removeItem("category");
+                handleClose();
+                navigate('/');
+            } else {
+                localStorage.removeItem("accountHolderData");
+                localStorage.removeItem("bookedClasses");
+                localStorage.removeItem("learnerbyauthtoken");
+                // localStorage.removeItem("com.learnerby.rating");
+
+                // localStorage.removeItem("category");
+                handleClose();
+                navigate('/');
+            }
+        }
+
     }
 
     return (
@@ -103,9 +137,9 @@ export default function CustomeButton() {
                                 size='small'
                                 sx={{ background: '#e8e8e8', padding: "6px 14px 5px 14px", borderRadius: '10px' }}
                             >
-                                <Typography sx={{ fontWeight: '600', color: 'black', fontSize: '15px' }}>
+                                <DashBoardText>
                                     DASHBORAD
-                                </Typography>
+                                </DashBoardText>
                             </MenuButton>
                             <Menu
                                 id="basic-menu"
@@ -143,7 +177,11 @@ export default function CustomeButton() {
                                 <Button variant='container' sx={{ backgroundColor: "#2b2b2b", color: "white" }}
                                     onClick={() => { openDialog() }} >
                                     Login</Button>
-                                <Button color='inherit' onClick={() => { openMentorLoginDialog() }}>Become a Mentor</Button>
+                                <Button color='inherit' onClick={() => { openMentorLoginDialog() }}>
+                                    <Typography sx={{ fontWeight: 'bold' }}>
+                                        Become a Mentor
+                                    </Typography>
+                                </Button>
                             </Stack>
                         </CustomButtonInBigScreen>
 

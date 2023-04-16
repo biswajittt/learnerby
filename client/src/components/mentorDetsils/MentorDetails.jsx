@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Radio, RadioGroup, DialogTitle, Dialog, DialogActions, DialogContent, Card, Tabs, Tab, Box, styled, Stack, Avatar, Grid, Paper, Button, Typography, Divider, Chip, Skeleton, FormControl, FormLabel, FormControlLabel, CircularProgress } from '@mui/material'
+import { Modal, Radio, RadioGroup, DialogTitle, Dialog, DialogActions, DialogContent, Card, Tabs, Tab, Box, styled, Stack, Avatar, Grid, Paper, Button, Typography, Divider, Chip, Skeleton, FormControl, FormLabel, FormControlLabel, CircularProgress } from '@mui/material'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
@@ -11,17 +11,47 @@ import RatingTab from './Tabs/RatingTab';
 import ReviewTab from './Tabs/ReviewTab';
 import { useNavigate, useParams } from 'react-router-dom'
 import { getMentorDetails } from "../../redux/actions/index"
+import { getRatingReviewData } from "../../redux/actions/ratingReviewAction"
 import axios from 'axios'
 import Stripe from '../stripe/Stripe'
 import LockClockIcon from '@mui/icons-material/LockClock';
+import PaymentSection from './Tabs/PaymentSection';
+import { borderRadius } from '@mui/system';
+import VerifiedIcon from '@mui/icons-material/Verified';
+import HandshakeIcon from '@mui/icons-material/Handshake';
+
+import experience from './Tabs/Icons/experience.png'
+import about from './Tabs/Icons/about.png'
+import skills from './Tabs/Icons/skills.png'
+import teaching from './Tabs/Icons/teacher.png'
+import price from './Tabs/Icons/money.png'
+import Connect from './Components/Connect';
+
+
 
 
 const MentorDetailsContainer = styled(Box)`
-background: white;
+background: #f5f5f5;
 width: auto;
-height: 75rem;
+
 margin: 10px 10px 0 10px;
 `
+
+const MentorDetailsHeader = styled(Box)(({ theme }) => ({
+    background: 'linear-gradient(to left,#ff9966,#ff5e62)',
+    width: 'inherit',
+    height: '10rem',
+    marginTop: '65px'
+}));
+
+const MentorDetailsHeaderTitle = styled(Typography)(({ theme }) => ({
+
+    left: '50%',
+    top: '17%',
+    transform: 'translate(-50%,-50%)',
+    color: 'black',
+    zIndex: '999'
+}));
 
 const MentorDetailsBody = styled(Stack)(({ theme }) => ({
     marginTop: '25px',
@@ -30,9 +60,11 @@ const MentorDetailsBody = styled(Stack)(({ theme }) => ({
     },
 }));
 
-const MentorDetailsContainerContent = styled(Box)`
-padding: 0 13px;
-`
+const MentorDetailsContainerContent = styled(Box)(({ theme }) => ({
+    padding: '0 13px',
+    background: '#f5f5f5',
+
+}));
 
 const RoundCard = styled(Box)`
 width: 108px;
@@ -40,15 +72,41 @@ height: 108px;
 border-radius: 50%;
 `
 
-const MentorHeaderInfo = styled(Grid)`
-// margin-top: -30px;
-margin-top: 177px;
-`
+const MentorHeaderInfo = styled(Grid)(({ theme }) => ({
+    marginTop: '-40px'
 
-const MentorNameTitleOnHeader = styled(Box)`
-margin-top: 17px;
-margin-left: 10px;
-`
+}))
+
+const MentorName = styled(Typography)(({ theme }) => ({
+    fontWeight: 'bold',
+    fontSize: '22px',
+    [theme.breakpoints.down(689)]: {
+        fontSize: '18px',
+    },
+    [theme.breakpoints.down(647)]: {
+        fontSize: '16px',
+    },
+}))
+
+
+
+const ConnectButton = styled(Button)(({ theme }) => ({
+    background: '#262626',
+    ":hover": {
+        background: '#555555',
+
+    },
+    [theme.breakpoints.down(776)]: {
+
+    },
+}))
+
+const MentorNameTitleOnHeader = styled(Box)(({ theme }) => ({
+    marginTop: '30px',
+    marginLeft: '10px'
+}))
+
+
 const HeaderButtons = styled(Stack)`
 margin-top: 38px;
 `
@@ -56,6 +114,7 @@ margin-top: 38px;
 const MentorBodyInfo = styled(Stack)(({ theme }) => ({
     marginTop: '25px',
     flexDirection: 'row',
+
     [theme.breakpoints.down(626)]: {
         flexDirection: 'column',
     },
@@ -64,7 +123,7 @@ const MentorBodyInfo = styled(Stack)(({ theme }) => ({
 const MentorBodyFirstCard = styled(Box)(({ theme }) => ({
     width: '650px',
     height: '488px',
-    background: '#f9f9f9',
+    background: '#ffffff',
     borderRadius: '12px',
     marginRight: '372px',
     [theme.breakpoints.down(1285)]: {
@@ -83,8 +142,16 @@ const MentorBodyFirstCard = styled(Box)(({ theme }) => ({
         width: 'auto',
         marginBottom: '20px'
     },
+    [theme.breakpoints.down(626)]: {
+        width: '100%',
+        marginBottom: '12px'
+    },
 }));
+const Icon = styled('img')(({ theme }) => ({
+    height: '37px',
+    marginTop: '3px'
 
+}));
 
 const MentorBodyFirstCardContent = styled(Stack)`
 padding: 10px 20px 10px 20px;
@@ -92,8 +159,8 @@ padding: 10px 20px 10px 20px;
 
 const MentorBodySecondCard = styled(Box)(({ theme }) => ({
     width: '450px',
-    height: '385px',
-    background: '#f9f9f9',
+    height: '488px',
+    background: '#ffffff',
     borderRadius: '12px',
     [theme.breakpoints.down(1285)]: {
 
@@ -101,6 +168,10 @@ const MentorBodySecondCard = styled(Box)(({ theme }) => ({
     [theme.breakpoints.down(740)]: {
 
         width: '389px',
+    },
+    [theme.breakpoints.down(626)]: {
+        width: '100%',
+        marginBottom: '12px'
     },
     [theme.breakpoints.down('sm')]: {
         margin: '1px 1px 1px 1px',
@@ -110,15 +181,40 @@ const MentorBodySecondCard = styled(Box)(({ theme }) => ({
 }));
 
 
-const MentorBodySecondCardContent = styled(Stack)`
-padding: 10px 20px 10px 20px;
-`
-const SkeletonContainer = styled(Stack)`
+const MentorBodySecondCardContent = styled(Stack)(({ theme }) => ({
+    padding: '10px 20px 10px 20px'
+}))
 
-`
-const MentorFooterInfo = styled(Box)`
 
-`
+const SkeletonContainer = styled(Stack)(({ theme }) => ({
+    marginTop: '110px'
+}))
+
+const SkeletonMentorBodySecondCard = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: '100%',
+    background: '#ffffff',
+    borderRadius: '12px',
+    [theme.breakpoints.down(1285)]: {
+
+    },
+    [theme.breakpoints.down(740)]: {
+
+        width: '389px',
+    },
+    [theme.breakpoints.down(626)]: {
+        width: '100%',
+        marginBottom: '12px'
+    },
+    [theme.breakpoints.down('sm')]: {
+        margin: '1px 1px 1px 1px',
+        width: 'auto',
+        marginBottom: '20px'
+    },
+}));
+const MentorFooterInfo = styled(Box)(({ theme }) => ({
+    marginBottom: '40px'
+}));
 export default function MentorDetails() {
 
     const toCamelCase = (text) => {
@@ -137,13 +233,17 @@ export default function MentorDetails() {
     //         const res = axios.get("http://localhost:3000/mentordetails/:id")
     //     }
     // }
+    const [accountType, setAccountType] = useState({ available: false, accountHolderId: '', accountHolderEmail: '', type: '' })
     const navigate = useNavigate();
     useEffect(() => {
         if (!localStorage.getItem('accountHolderData')) {
             navigate('/');
+        } else {
+            const retrievedData = localStorage.getItem('accountHolderData')
+            const accountHolderProfileData = JSON.parse(retrievedData)
+            setAccountType({ available: true, accountHolderId: accountHolderProfileData._id, accountHolderEmail: accountHolderProfileData.email, category: accountHolderProfileData.category })
         }
     }, []);
-
 
     //
 
@@ -155,7 +255,11 @@ export default function MentorDetails() {
     const { mentor } = useSelector((state) => state.getMentorDetailsReducers);
     const { loading, isPaymentSuccessfull, dataAfterClassBooking } = useSelector((state) => state.bookClassReducer);
 
+
+
     // const bookedClassesData = dataAfterBookingClass.bookedClasses.map((data))
+
+
     if (dataAfterClassBooking != 'undefined' && dataAfterClassBooking) {
         const bookedClassesData = dataAfterClassBooking.data.dataAfterBookingClass.bookedClasses.map((data) => {
             const mentorId = dataAfterClassBooking.data.dataAfterBookingClass.mentorId;
@@ -181,20 +285,27 @@ export default function MentorDetails() {
 
     //checking verified student who paid
     const [verifiedStudent, setVerifiedStudent] = useState(false);
-
+    // if (loading == false) {
+    //     setVerifiedStudent(true);
+    // }
+    // console.log(verifiedStudent)
 
     useEffect(() => {
         // if (mentor && id !== mentor._id)
         dispatch(getMentorDetails(id));
 
         // checking verified student who paid
-        const mentorId = JSON.parse(localStorage.getItem("bookedClasses")).mentorId;
-        // console.log("daddqwdqdqd", mentorId)
-        if (id == mentorId) {
-            setVerifiedStudent(true);
-        }
+        // const bookedClassData = JSON.parse(localStorage.getItem("bookedClasses"));
+        // // const mentorId = JSON.parse(localStorage.getItem("bookedClasses")).mentorId;
+        // // console.log("daddqwdqdqd", mentorId)
+        // if (bookedClassData && id == bookedClassData.mentorId) {
 
-    }, [])
+        //     // console.log("hi from md verieft")
+        //     setVerifiedStudent(true);
+        // }
+
+
+    }, [id])
 
     console.log(mentor)
 
@@ -216,7 +327,7 @@ export default function MentorDetails() {
         setOpenDialog(false);
     };
 
-    const [amountValue, setAmountValue] = useState(0);
+    const [amountValue, setAmountValue] = useState(1);
     const amountHandleChange = (event) => {
         setAmountValue(event.target.value);
         console.log(amountValue)
@@ -234,6 +345,11 @@ export default function MentorDetails() {
     };
 
 
+    // fetching review and rating data
+    // useEffect(() => {
+    //     console.log(id)
+    //     dispatch(getRatingReviewData(id));
+    // }, [])
 
 
 
@@ -256,245 +372,332 @@ export default function MentorDetails() {
             setBannerImage(data.results[0].urls.full)
         })
 
+    //open contact modal
+    const [openContactModal, setOpenContactModal] = useState(false);
+
+    const handleContactModalOpen = () => setOpenContactModal(true);
+    const handleContactModalClose = () => setOpenContactModal(false);
+
+
+
     return (
-        <MentorDetailsContainer>
+        <MentorDetailsContainer sx={{ height: (accountType.category == 'mentor' ? '49rem' : '100%') }}>
             {
                 (mentor && Object.keys(mentor).length) ?
-                    <Stack direction="column" spacing={2}>
-                        <Box sx={{ background: '#e3e3e3', height: '13rem', width: 'inherit' }} >
-                            {/* <img src={bannerImage} alt="d" style={{ height: '13rem', width: '1032px' }} /> */}
-                            <MentorDetailsContainerContent>
-                                <MentorHeaderInfo container spacing={2}>
-                                    <Grid item xs={8}>
-                                        <Stack direction='row'>
-                                            <Avatar alt='avatar' src={mentor[0].profileimage.url} sx={{ width: '100px', height: '100px', background: 'white' }} />
-                                            <MentorNameTitleOnHeader>
-                                                <Typography variant="h6">{mentor[0].name}</Typography>
-                                                <Typography variant="caption">I am a mentor in agartala</Typography>
-                                            </MentorNameTitleOnHeader>
+                    // <Stack direction="column">
+                    <Box sx={{ position: 'relative' }}>
+                        {/* <img src={bannerImage} alt="d" style={{ height: '13rem', width: '1032px' }} /> */}
+
+                        <MentorDetailsHeader >
+                            <MentorDetailsHeaderTitle>
+                                ALex
+                            </MentorDetailsHeaderTitle>
+                        </MentorDetailsHeader>
+
+                        <MentorHeaderInfo container spacing={2}>
+                            <Grid item xs={8}>
+                                <Stack direction='row'>
+                                    <Box sx={{ padding: "4px", borderRadius: '50%', background: '#ffffff' }}>
+                                        <Avatar alt='avatar' src={mentor[0].profileimage.url} sx={{ width: '100px', height: '100px', background: 'white' }} />
+                                    </Box>
+                                    <MentorNameTitleOnHeader>
+
+                                        <Stack direction='row'
+                                            sx={
+                                                (theme) => ({
+                                                    justifyContent: 'space-between'
+                                                })
+                                            }
+                                        >
+                                            <Stack spacing={2} direction='row' sx={{ marginRight: '22px' }}>
+                                                <MentorName>{mentor[0].name}</MentorName>
+                                                <VerifiedIcon sx={{ marginTop: '3px', color: '#00b400' }} />
+                                            </Stack>
+
+                                            <ConnectButton variant="contained" startIcon={<HandshakeIcon />} size="small" onClick={handleContactModalOpen} onclose={handleContactModalClose}>
+                                                <Typography
+                                                    sx={(theme) => ({
+                                                        [theme.breakpoints.down(689)]: {
+                                                            fontSize: '15px',
+                                                        },
+                                                        [theme.breakpoints.down(647)]: {
+                                                            fontSize: '13px',
+                                                        },
+                                                    })}
+                                                >
+                                                    Contact
+                                                </Typography>
+                                            </ConnectButton>
+
+                                            <Connect openContactModal={openContactModal} handleContactModalClose={handleContactModalClose} accountHolderId={accountType.accountHolderId} accountHolderEmail={accountType.accountHolderEmail} />
+
                                         </Stack>
-                                    </Grid>
-                                    <Grid item xs={4}>
-                                        {/* <HeaderButtons direction='row' spacing={2}>
+
+                                        <Typography sx={{ fontSize: '12px', fontWeight: 'bold', opacity: '53%' }}>I am a teacher with 2 years of experience</Typography>
+
+                                    </MentorNameTitleOnHeader>
+                                </Stack>
+                            </Grid>
+                            <Grid item xs={4}>
+                                {/* <HeaderButtons direction='row' spacing={2}>
                                             <Button variant="outlined" size="small">...</Button>
                                             <Button variant="outlined" size="small">Message</Button>
                                             <Button variant="contained" size="small" startIcon={<AddIcon />}>
                                                 Follow
                                             </Button>
                                         </HeaderButtons> */}
-                                    </Grid>
-                                </MentorHeaderInfo>
+                            </Grid>
+                        </MentorHeaderInfo>
 
-                                <MentorBodyInfo>
-                                    <MentorBodyFirstCard>
-                                        <MentorBodyFirstCardContent spacing={2} divider={<Divider orientation="horizontal" flexItem></Divider>}>
-                                            <Box>
-                                                <Typography variant="subtitle1">Experience</Typography>
-                                                <Typography variant="caption">I am a mentor in agartala</Typography>
-                                            </Box>
-                                            <Box>
-                                                <Typography variant="subtitle1">About Me</Typography>
-                                                <Typography variant="caption">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus totam magnam quas error accusantium iure suscipit! Nam, voluptatem! Error sapiente similique provident perspiciatis atque hic itaque dolor ex accusantium ipsa!</Typography>
-                                            </Box>
-                                            <Box>
-                                                <Typography variant="subtitle1">Skills</Typography>
-                                                <Stack direction='row' spacing={2}>
-                                                    {
-                                                        mentor[0].interest.map((data, index) => (
+                        <MentorDetailsContainerContent>
 
-                                                            <Chip key={index} label={toCamelCase(data)} variant="outlined" sx={{ margin: '2px 2px 2px 2px' }} />
+                            <MentorBodyInfo>
+                                <MentorBodyFirstCard>
+                                    <MentorBodyFirstCardContent spacing={2} divider={<Divider orientation="horizontal" flexItem></Divider>}>
+                                        <Box>
+                                            <Stack direction='row' spacing={1.5}>
 
-                                                        ))
-
-                                                    }
-
+                                                <Icon src={experience} alt="experience" />
+                                                <Stack>
+                                                    <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>Experience</Typography>
+                                                    <Typography sx={{ fontSize: '14px', fontFamily: 'system-ui' }}>I am a mentor</Typography>
                                                 </Stack>
-                                            </Box>
-                                            <Box>
-                                                <Typography variant="subtitle1">Mode of teaching</Typography>
-                                                {
-                                                    mentor[0].mode === 'both' ?
-                                                        <Stack direction='row' spacing={2}>
-                                                            <Typography variant="caption">Online</Typography>
-                                                            <Typography variant="caption">Offline</Typography>
-                                                        </Stack>
-                                                        :
-                                                        <Typography variant="caption">{mentor[0].mode}</Typography>
-                                                }
-                                            </Box>
-                                            <Box>
-                                                <Typography variant="subtitle1">Price</Typography>
-                                                <Stack direction='row' spacing={2}>
-                                                    <Chip label={mentor[0].priceperhour + "rs /hour"} sx={{ margin: '2px 2px 2px 2px' }} />
-                                                    <Chip label={mentor[0].priceperday + "rs /day"} sx={{ margin: '2px 2px 2px 2px' }} />
-                                                </Stack>
-                                            </Box>
-                                        </MentorBodyFirstCardContent>
-                                    </MentorBodyFirstCard>
-
-                                    <MentorBodySecondCard>
-
-                                        {
-                                            (verifiedStudent) ?
-                                                <MentorBodySecondCardContent spacing={2} >
-                                                    <Box>
-                                                        <Typography variant="subtitle1">Location</Typography>
-                                                        <Button startIcon={<LocationOnIcon />} size='small'>{mentor[0].address}</Button>
-                                                    </Box>
-                                                    <Box>
-                                                        <Typography variant="subtitle1">Email</Typography>
-                                                        <Typography variant="caption">{mentor[0].email}</Typography>
-                                                    </Box>
-                                                    <Box>
-                                                        <Typography variant="subtitle1">Price</Typography>
-                                                        <Stack direction='row' spacing={2}>
-                                                            <Chip label={mentor[0].priceperhour + "rs /hour"} sx={{ margin: '2px 2px 2px 2px' }} />
-                                                            <Chip label={mentor[0].priceperday + "rs /day"} sx={{ margin: '2px 2px 2px 2px' }} />
-                                                        </Stack>
-                                                    </Box>
-                                                    <Box>
-                                                        <Typography variant="subtitle1">Mode of teaching</Typography>
-                                                        {
-                                                            mentor[0].mode === 'both' ?
-                                                                <Stack direction='row' spacing={2}>
-                                                                    <Typography variant="caption">Online</Typography>
-                                                                    <Typography variant="caption">Offline</Typography>
-                                                                </Stack>
-                                                                :
-                                                                <Typography variant="caption">{mentor[0].mode}</Typography>
-                                                        }
-                                                    </Box>
-                                                    <Box>
-                                                        <Typography variant="subtitle1">Mobile Number</Typography>
-                                                        <Typography variant="caption">{mentor[0].phonenumber}</Typography>
-                                                    </Box>
-                                                </MentorBodySecondCardContent> :
-                                                <MentorBodySecondCardContent>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '140px' }}>
-                                                        {
-                                                            (loading) ?
-                                                                <CircularProgress /> :
-                                                                <Stack spacing={2}>
-                                                                    <LockClockIcon sx={{ fontSize: '2.5rem', marginLeft: '26px' }} />
-
-                                                                    <Button size='large' onClick={handleClickOpen}>
-                                                                        <Typography >Book a class</Typography>
-                                                                    </Button>
-                                                                </Stack>
-                                                        }
-
-                                                    </Box>
-                                                    <Dialog
-                                                        fullScreen={fullScreen}
-                                                        open={openDialog}
-                                                        onClose={handleClose}
-                                                        aria-labelledby="responsive-dialog-title"
-                                                    >
-                                                        <DialogTitle id="responsive-dialog-title">
-                                                            {"Choose class details for payment"}
-                                                        </DialogTitle>
-                                                        <DialogContent>
-                                                            <Stack>
-                                                                <FormControl>
-                                                                    <FormLabel id="demo-controlled-radio-buttons-group">Choose Payment</FormLabel>
-                                                                    <RadioGroup
-                                                                        aria-labelledby="demo-controlled-radio-buttons-group"
-                                                                        name="controlled-radio-buttons-group"
-                                                                        value={amountValue}
-                                                                        onChange={amountHandleChange}
-                                                                    >
-                                                                        <FormControlLabel value={mentor[0].priceperhour} control={<Radio />} label={mentor[0].priceperhour + "rs /hour"} />
-                                                                        <FormControlLabel value={mentor[0].priceperday} control={<Radio />} label={mentor[0].priceperday + "rs /day"} />
-                                                                    </RadioGroup>
-                                                                </FormControl>
-
-                                                                <FormControl>
-                                                                    <FormLabel id="demo-controlled-radio-buttons-group">Choose Subject</FormLabel>
-                                                                    <RadioGroup
-                                                                        aria-labelledby="demo-controlled-radio-buttons-group"
-                                                                        name="controlled-radio-buttons-group"
-                                                                        value={subject}
-                                                                        onChange={subjectHandleChange}
-                                                                    >
-                                                                        {
-                                                                            mentor[0].interest.map((data, index) => (
-                                                                                <FormControlLabel value={data} control={<Radio />} label={data} />
-                                                                            ))
-
-                                                                        }
-                                                                    </RadioGroup>
-                                                                </FormControl>
-
-                                                                <FormControl>
-                                                                    <FormLabel id="demo-controlled-radio-buttons-group">Choose Mode</FormLabel>
-                                                                    <RadioGroup
-                                                                        aria-labelledby="demo-controlled-radio-buttons-group"
-                                                                        name="controlled-radio-buttons-group"
-                                                                        value={teachingMode}
-                                                                        onChange={modeHandleChange}
-                                                                    >
-                                                                        {
-                                                                            mentor[0].mode === 'both' ?
-                                                                                <Stack direction='row' spacing={2}>
-                                                                                    <FormControlLabel value='online' control={<Radio />} label='Online' />
-                                                                                    <FormControlLabel value='offline' control={<Radio />} label='Offline' />
-                                                                                    {/* <Typography variant="caption">Online</Typography>
-                                                                                    <Typography variant="caption">Offline</Typography> */}
-                                                                                </Stack>
-                                                                                :
-                                                                                <Stack>
-                                                                                    <FormControlLabel value='online' control={<Radio />} label='Online' />
-                                                                                    <FormControlLabel value='offline' control={<Radio />} label='Offline' />
-                                                                                    <FormControlLabel value='both' control={<Radio />} label='Both' />
-                                                                                </Stack>
-                                                                        }
-                                                                    </RadioGroup>
-                                                                </FormControl>
-
-                                                            </Stack>
-                                                        </DialogContent>
-                                                        <DialogActions>
-                                                            <Box onClick={handleClose}>
-                                                                <Stripe amount={amountValue} mentorData={mentor} classDetails={{ subject, teachingMode }} />
-                                                            </Box>
-                                                            {/* <Button autoFocus onClick={handleClose}>
-                                                                Continue
-                                                            </Button> */}
-                                                            <Button onClick={handleClose} autoFocus>
-                                                                Cancle
-                                                            </Button>
-                                                        </DialogActions>
-                                                    </Dialog>
-
-                                                </MentorBodySecondCardContent>
-                                        }
-
-                                    </MentorBodySecondCard>
-
-                                </MentorBodyInfo>
-
-                                <MentorFooterInfo>
-                                    <TabContext value={value}>
-                                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                                            <TabList aria-label='Tabs Example' onChange={handleChange}>
-                                                <Tab label="Rating & Review" value='1' />
-                                                <Tab label="Rate This Mentor" value='2' />
-                                            </TabList>
+                                            </Stack>
                                         </Box>
-                                        <TabPanel value='1'>
-                                            <RatingTab />
-                                        </TabPanel>
-                                        <TabPanel value='2'>
-                                            <ReviewTab />
-                                        </TabPanel>
-                                    </TabContext>
-                                </MentorFooterInfo>
-                            </MentorDetailsContainerContent>
-                        </Box>
-                    </Stack> :
+
+                                        <Box >
+                                            <Stack direction='row' spacing={1.5}>
+
+                                                <Icon src={about} alt="about" />
+                                                <Stack>
+                                                    <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>About Me</Typography>
+                                                    <Typography sx={{ fontSize: '14px', fontFamily: 'system-ui' }}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus totam magnam quas error accusantium iure suscipit!</Typography>
+                                                </Stack>
+                                            </Stack>
+
+                                        </Box>
+
+                                        <Box>
+                                            <Stack direction='row' spacing={1.5}>
+
+                                                <Icon src={skills} alt="skills" />
+                                                <Stack>
+                                                    <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>Skills</Typography>
+                                                    <Stack direction='row' spacing={2}>
+                                                        {
+                                                            mentor[0].interest.map((data, index) => (
+
+                                                                <Chip key={index} label={toCamelCase(data)} variant="outlined" sx={{ margin: '2px 2px 2px 2px', fontSize: '14px', fontFamily: 'system-ui' }} />
+
+                                                            ))
+
+                                                        }
+
+                                                    </Stack>
+                                                </Stack>
+                                            </Stack>
+
+                                        </Box>
+
+                                        <Box>
+                                            <Stack direction='row' spacing={1.5}>
+
+                                                <Icon src={teaching} alt="teaching" />
+                                                <Stack>
+                                                    <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>Mode of teaching</Typography>
+                                                    {
+                                                        mentor[0].mode === 'both' ?
+                                                            <Stack direction='row' spacing={2}>
+                                                                <Typography variant="caption" sx={{ fontSize: '14px', fontFamily: 'system-ui' }}>Online</Typography>
+                                                                <Typography variant="caption" sx={{ fontSize: '14px', fontFamily: 'system-ui' }}>Offline</Typography>
+                                                            </Stack>
+                                                            :
+                                                            <Typography variant="caption" sx={{ textTransform: 'capitalize', fontSize: '14px', fontFamily: 'system-ui' }}>{mentor[0].mode}</Typography>
+                                                    }
+                                                </Stack>
+                                            </Stack>
+
+                                        </Box>
+
+                                        <Box>
+                                            <Stack direction='row' spacing={1.5}>
+
+                                                <Icon src={price} alt="price" />
+                                                <Stack>
+                                                    <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>Price</Typography>
+                                                    <Stack direction='row' spacing={2}>
+                                                        <Chip label={mentor[0].priceperhour + "rs /hour"} sx={{ margin: '2px 2px 2px 2px', fontSize: '14px', fontFamily: 'system-ui' }} />
+                                                        <Chip label={mentor[0].priceperday + "rs /day"} sx={{ margin: '2px 2px 2px 2px', fontSize: '14px', fontFamily: 'system-ui' }} />
+                                                    </Stack>
+                                                </Stack>
+                                            </Stack>
+
+                                        </Box>
+
+                                    </MentorBodyFirstCardContent>
+                                </MentorBodyFirstCard>
+
+                                <MentorBodySecondCard>
+                                    <PaymentSection openDialog={openDialog} handleClose={handleClose} handleClickOpen={handleClickOpen} />
+
+                                    {
+                                        // (verifiedStudent) ?
+                                        //     <MentorBodySecondCardContent spacing={2} >
+                                        //         <Box>
+                                        //             <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>Location</Typography>
+                                        //             <Button startIcon={<LocationOnIcon />} size='small'>{mentor[0].address}</Button>
+                                        //         </Box>
+                                        //         <Box>
+                                        //             <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>Email</Typography>
+                                        //             <Typography variant="caption">{mentor[0].email}</Typography>
+                                        //         </Box>
+                                        //         <Box>
+                                        //             <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>Price</Typography>
+                                        //             <Stack direction='row' spacing={2}>
+                                        //                 <Chip label={mentor[0].priceperhour + "rs /hour"} sx={{ margin: '2px 2px 2px 2px' }} />
+                                        //                 <Chip label={mentor[0].priceperday + "rs /day"} sx={{ margin: '2px 2px 2px 2px' }} />
+                                        //             </Stack>
+                                        //         </Box>
+                                        //         <Box>
+                                        //             <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>Mode of teaching</Typography>
+                                        //             {
+                                        //                 mentor[0].mode === 'both' ?
+                                        //                     <Stack direction='row' spacing={2}>
+                                        //                         <Typography variant="caption">Online</Typography>
+                                        //                         <Typography variant="caption">Offline</Typography>
+                                        //                     </Stack>
+                                        //                     :
+                                        //                     <Typography variant="caption">{mentor[0].mode}</Typography>
+                                        //             }
+                                        //         </Box>
+                                        //         <Box>
+                                        //             <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>Mobile Number</Typography>
+                                        //             <Typography variant="caption">{mentor[0].phonenumber}</Typography>
+                                        //         </Box>
+                                        //     </MentorBodySecondCardContent> :
+                                        //     <MentorBodySecondCardContent>
+                                        //         <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '140px' }}>
+                                        //             {
+                                        //                 (loading) ?
+                                        //                     <CircularProgress /> :
+                                        //                     <Stack spacing={2}>
+                                        //                         <LockClockIcon sx={{ fontSize: '2.5rem', marginLeft: '26px' }} />
+
+                                        //                         <Button size='large' onClick={handleClickOpen}>
+                                        //                             <Typography >Book a class</Typography>
+                                        //                         </Button>
+                                        //                     </Stack>
+                                        //             }
+
+                                        //         </Box>
+                                        //         <Dialog
+                                        //             fullScreen={fullScreen}
+                                        //             open={openDialog}
+                                        //             onClose={handleClose}
+                                        //             aria-labelledby="responsive-dialog-title"
+                                        //         >
+                                        //             <DialogTitle id="responsive-dialog-title">
+                                        //                 {"Choose class details for payment"}
+                                        //             </DialogTitle>
+                                        //             <DialogContent>
+                                        //                 <Stack>
+                                        //                     <FormControl>
+                                        //                         <FormLabel id="demo-controlled-radio-buttons-group">Choose Payment</FormLabel>
+                                        //                         <RadioGroup
+                                        //                             aria-labelledby="demo-controlled-radio-buttons-group"
+                                        //                             name="controlled-radio-buttons-group"
+
+                                        //                             onChange={amountHandleChange}
+                                        //                             value={amountValue}
+                                        //                         >
+                                        //                             <FormControlLabel value={mentor[0].priceperhour} control={<Radio />} label={mentor[0].priceperhour + "rs /hour"} />
+                                        //                             <FormControlLabel value={mentor[0].priceperday} control={<Radio />} label={mentor[0].priceperday + "rs /day"} />
+                                        //                         </RadioGroup>
+                                        //                     </FormControl>
+
+                                        //                     <FormControl>
+                                        //                         <FormLabel id="demo-controlled-radio-buttons-group">Choose Subject</FormLabel>
+                                        //                         <RadioGroup
+                                        //                             aria-labelledby="demo-controlled-radio-buttons-group"
+                                        //                             name="controlled-radio-buttons-group"
+                                        //                             value={subject}
+                                        //                             onChange={subjectHandleChange}
+                                        //                         >
+                                        //                             {
+                                        //                                 mentor[0].interest.map((data, index) => (
+                                        //                                     <FormControlLabel value={data} control={<Radio />} label={data} />
+                                        //                                 ))
+
+                                        //                             }
+                                        //                         </RadioGroup>
+                                        //                     </FormControl>
+
+                                        //                     <FormControl>
+                                        //                         <FormLabel id="demo-controlled-radio-buttons-group">Choose Mode</FormLabel>
+                                        //                         <RadioGroup
+                                        //                             aria-labelledby="demo-controlled-radio-buttons-group"
+                                        //                             name="controlled-radio-buttons-group"
+                                        //                             value={teachingMode}
+                                        //                             onChange={modeHandleChange}
+                                        //                         >
+                                        //                             {
+                                        //                                 mentor[0].mode === 'both' ?
+                                        //                                     <Stack direction='row' spacing={2}>
+                                        //                                         <FormControlLabel value='online' control={<Radio />} label='Online' />
+                                        //                                         <FormControlLabel value='offline' control={<Radio />} label='Offline' />
+                                        //                                     </Stack>
+                                        //                                     :
+                                        //                                     <Stack>
+                                        //                                         <FormControlLabel value='online' control={<Radio />} label='Online' />
+                                        //                                         <FormControlLabel value='offline' control={<Radio />} label='Offline' />
+                                        //                                         <FormControlLabel value='both' control={<Radio />} label='Both' />
+                                        //                                     </Stack>
+                                        //                             }
+                                        //                         </RadioGroup>
+                                        //                     </FormControl>
+
+                                        //                 </Stack>
+                                        //             </DialogContent>
+                                        //             <DialogActions>
+                                        //                 <Box onClick={handleClose}>
+                                        //                     <Stripe amount={amountValue} mentorData={mentor} classDetails={{ subject, teachingMode }} />
+                                        //                 </Box>
+                                        //                 <Button onClick={handleClose} autoFocus>
+                                        //                     Cancle
+                                        //                 </Button>
+                                        //             </DialogActions>
+                                        //         </Dialog>
+
+                                        //     </MentorBodySecondCardContent>
+                                    }
+
+                                </MentorBodySecondCard>
+
+                            </MentorBodyInfo>
+
+
+                            {
+                                (accountType.available && accountType.category != 'mentor') ?
+                                    <MentorFooterInfo>
+                                        <Divider sx={{ marginTop: '32px', marginBottom: '22px' }}>
+                                            <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>
+                                                Students Rating & Review
+                                            </Typography>
+
+                                        </Divider>
+
+                                        <ReviewTab />
+                                    </MentorFooterInfo> :
+                                    null
+                            }
+
+                        </MentorDetailsContainerContent>
+                    </Box> :
+                    // </Stack> :
+
                     <SkeletonContainer direction="column" spacing={2}>
 
-                        <Box sx={{ background: '#e3e3e3', height: '13rem', width: 'inherit' }} >
+                        <Box sx={{ background: '#e3e3e3', width: 'inherit' }} >
                             <MentorDetailsContainerContent>
                                 <MentorHeaderInfo container spacing={2}>
                                     <Grid item xs={8}>
@@ -530,7 +733,7 @@ export default function MentorDetails() {
                                         </MentorBodyFirstCard>
                                     </Grid>
                                     <Grid item xs={4}>
-                                        <MentorBodySecondCard>
+                                        <SkeletonMentorBodySecondCard>
                                             <MentorBodySecondCardContent spacing={2} >
                                                 <Box>
                                                     <Skeleton variant="rectangular" sx={{ width: '90px', height: '25px', marginBottom: "10px" }} />
@@ -555,12 +758,13 @@ export default function MentorDetails() {
                                                     </Stack>
                                                 </Box>
                                             </MentorBodySecondCardContent>
-                                        </MentorBodySecondCard>
+                                        </SkeletonMentorBodySecondCard>
                                     </Grid>
                                 </MentorBodyInfo>
                             </MentorDetailsContainerContent>
                         </Box>
                     </SkeletonContainer>
+
             }
         </MentorDetailsContainer>
     )

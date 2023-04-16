@@ -16,7 +16,7 @@ export default function Stripe(props) {
     console.log(success)
     const tokenHandler = (token) => {
         dispatch(bookClass(id, token, props.amount, props.mentorData, props.classDetails))
-        console.log(props.classDetails)
+        console.log(props.amount)
         console.log("hulla")
         // console.log(d)
         // console.log(token)

@@ -1,15 +1,14 @@
 import { Paper, Stack, Box, styled, Typography, TextField, Button, Skeleton, Avatar, Autocomplete, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import React, { useEffect } from 'react'
-import image from '../Profile/mentor.jpg'
 import { useSelector } from 'react-redux';
 import { useState } from 'react';
-import { updateUserProfile } from '../../service/api';
+import { updateUserProfile } from '../../../service/api';
 
 import { useNavigate } from 'react-router-dom';
 
 const ProfileComponent = styled(Box)`
-margin: 73px 12px 15px 12px;
-margin-top: 115px;
+margin: 0px 12px 15px 12px;
+margin-top: 10px;
 `
 const Container = styled(Stack)`
 
@@ -370,7 +369,7 @@ export default function Profile(props) {
                                                 <TextField variant="filled"
                                                     disabled={clickedEdit}
                                                     id="outlined-disabled"
-                                                    value={accountHolderProfileData.aboutyou}
+                                                    value={accountHolderProfileData.aboutme}
                                                     size='small' />
 
                                                 <FormControl fullWidth variant='standard'>

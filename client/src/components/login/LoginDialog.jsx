@@ -6,8 +6,9 @@ import { useDispatch } from 'react-redux';
 
 import userloginbg from './userloginbg.png'
 
+
 const Component = styled(Box)`
-height: 70vh;
+height: 72vh;
 width: 90vh;
 `;
 const LeftContainer = styled(Box)`
@@ -97,13 +98,26 @@ const initialLoginValue = {
     password: ''
 }
 
+const isValidateEmail = (email) => {
+
+    const re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    console.log(re.test(email))
+    return re.test(email);
+};
+
+const isValidateMobileNumber = (mobile) => {
+
+    const re = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
+    return re.test(mobile);
+};
+
 export default function LoginDialog(props) {
 
     const [account, setToggleAccount] = useState(accountInitialValue.login);
 
     const [registrationData, setRegistrationData] = useState(initialRegistrationValue);
     const [loginData, setLoginData] = useState(initialLoginValue);
-    const [error, setError] = useState(false);
+    const [error, setError] = useState({ error: false, errorText: '' });
     const [continuButton, setContinueButton] = useState({ text: 'Continue', isClicked: false })
     const [loginButton, setLoginButton] = useState({ text: 'Login', isClicked: false, createAccountText: 'block' })
 
@@ -120,7 +134,7 @@ export default function LoginDialog(props) {
     const handleClose = () => {
         props.setOpenLoginDialog(false);
         setToggleAccount(accountInitialValue.login);
-        setError(false);
+        setError(false, '');
         setLoginButton({ text: 'Continue', isClicked: false })
         setLoginButton({ text: 'Login', isClicked: false })
     }
@@ -137,19 +151,66 @@ export default function LoginDialog(props) {
 
     const registerUser = async () => {
         setContinueButton({ text: 'Submiting...', isClicked: true });
+
+        if (registrationData.name == '' || registrationData.phonenumber == '' || registrationData.email == '' || registrationData.password == '') {
+            console.log("empty")
+            setError({ error: true, errorText: "All the fields are required" });
+            setContinueButton({ text: 'Continue', isClicked: false });
+            return;
+        }
+        // console.log(isValidateEmail('biswajitdeb324@gmail.com'))
+        if (!isValidateEmail(registrationData.email.toLowerCase())) {
+            // console.log("empty")
+            setError({ error: true, errorText: "Please enter a valid email Id" });
+            setContinueButton({ text: 'Continue', isClicked: false });
+            return;
+        }
+
+        if (!isValidateMobileNumber(registrationData.phonenumber)) {
+            // console.log("empty")
+            setError({ error: true, errorText: "Please enter a valid mobile number" });
+            setContinueButton({ text: 'Continue', isClicked: false });
+            return;
+        }
+
+        registrationData.email = registrationData.email.toLowerCase();
         let response = await authenticateRegistration(registrationData);
-        if (!response) return;
-        handleClose();
-        // setAccount(registerUser.name);
-        localStorage.setItem('accountHolderData', JSON.stringify(response.data.studentData))
-        console.log(response);
-        console.log(response.data.studentData);
-        dispatch(userInfoAfterRegistration(registrationData));
+
+        // if (!response) return;
+        if (response.status === 200) {
+            handleClose();
+            // setAccount(registerUser.name);
+            localStorage.setItem('accountHolderData', JSON.stringify(response.data.studentData))
+            console.log(response);
+            console.log(response.data.studentData);
+            dispatch(userInfoAfterRegistration(registrationData));
+        } else {
+            setError({ error: true, errorText: 'User already exist' });
+            setContinueButton({ text: 'Continue', isClicked: false });
+        }
+
 
     }
     const loginUser = async () => {
         setLoginButton({ text: 'Submitting...', isClicked: true, createAccountText: 'none' })
+        console.log(loginData)
+        if (loginData.email == '' || loginData.password == '') {
+            console.log("empty")
+            setError({ error: true, errorText: "All the fields are required" });
+            setLoginButton({ text: 'Login', isClicked: false, createAccountText: 'block' })
+            return;
+        }
+        // console.log(isValidateEmail('biswajitdeb324@gmail.com'))
+        if (!isValidateEmail(loginData.email.toLowerCase())) {
+            // console.log("empty")
+            setError({ error: true, errorText: "Please enter a valid email Id" });
+            setLoginButton({ text: 'Login', isClicked: false, createAccountText: 'block' })
+            return;
+        }
+
+        loginData.email = loginData.email.toLowerCase();
         let response = await authenticateLogin(loginData);
+
         if (response.status === 200) {
             // console.log("hi response", response)
             // console.log("hi response", response.data.data.token)
@@ -163,7 +224,7 @@ export default function LoginDialog(props) {
             dispatch(userInfoAfterLogin(response))
         } else {
             console.log(error)
-            setError(true);
+            setError({ error: true, errorText: 'Please enter valid login details' });
             setLoginButton({ text: 'Login', isClicked: false, createAccountText: 'block' })
         }
         // handleClose();
@@ -185,22 +246,38 @@ export default function LoginDialog(props) {
                     {
                         account.view === "login" ?
                             <RightContainer>
-                                <TextField variant='standard' name='email' onChange={(event) => { onInputChangeOnLogin(event) }} label='Enter Email/Phone Number' />
+                                <TextField variant='standard' name='email' type='email' onChange={(event) => { onInputChangeOnLogin(event) }} label='Enter Email/Phone Number' />
 
-                                {error && <Error>Please enter valid username or password</Error>}
 
-                                <TextField variant='standard' name='password' onChange={(event) => { onInputChangeOnLogin(event) }} label='Enter Password' />
-                                <TermsConditionText>By continuing, you agree to Learnerby`s terms of use and privacy policy</TermsConditionText>
+
+                                <TextField
+                                    variant='standard' name='password'
+                                    onChange={(event) => { onInputChangeOnLogin(event) }}
+                                    label='Enter Password'
+                                    type='password'
+                                />
+                                {/* <TermsConditionText>By continuing, you agree to Learnerby`s terms of use and privacy policy</TermsConditionText> */}
+                                {
+                                    (error.error) ?
+                                        <Error>{error.errorText}</Error> :
+                                        null
+                                }
                                 <LoginButton onClick={() => { loginUser() }} disabled={loginButton.isClicked}>
                                     <Typography sx={{ color: 'white' }}>{loginButton.text}</Typography>
                                 </LoginButton>
                                 <CreateAccountText onClick={toggleRegistration} sx={{ display: loginButton.createAccountText }}>New to Learnerby? Create an account</CreateAccountText>
                             </RightContainer> :
+
                             <RightContainer>
                                 <TextField variant='standard' name='name' onChange={(event) => { onInputChangeOnRegistration(event) }} label='Enter Name' />
                                 <TextField variant='standard' name='email' onChange={(event) => { onInputChangeOnRegistration(event) }} label='Enter Email' />
                                 <TextField variant='standard' name='phonenumber' onChange={(event) => { onInputChangeOnRegistration(event) }} label='Enter Phone Number' />
                                 <TextField variant='standard' name='password' onChange={(event) => { onInputChangeOnRegistration(event) }} label='Enter Password' />
+                                {
+                                    (error.error) ?
+                                        <Error>{error.errorText}</Error> :
+                                        null
+                                }
                                 <LoginButton onClick={() => { registerUser() }} disabled={continuButton.isClicked}>
                                     <Typography sx={{ fontWeight: '600', color: '#fff' }}> {continuButton.text}</Typography>
                                 </LoginButton>

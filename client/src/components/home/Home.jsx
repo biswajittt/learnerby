@@ -65,9 +65,9 @@ export default function Home() {
                 <Banner />
                 <Slide type="Teaching Mode" title="Online" mentors={find("teaching_mode", 'online')} />
                 <Slide type="Teaching Mode" title="Offline" mentors={find("teaching_mode", 'offline')} />
-                <Slide type="interest" title="Mathematics" mentors={find("interest", 'Mathematics')} />
-                <Slide type="interest" title="Physics" mentors={find("interest", 'Physics')} />
-                <Slide type="interest" title="Chemistry" mentors={find("interest", 'Chemistry')} />
+                <Slide type="interest" title="Mathematics" mentors={find("interest", 'mathematics')} />
+                <Slide type="interest" title="Physics" mentors={find("interest", 'physics')} />
+                <Slide type="interest" title="Chemistry" mentors={find("interest", 'chemistry')} />
             </Component>
             {
                 (localStorage.getItem("accountHolderData") == null) ?

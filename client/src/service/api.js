@@ -43,7 +43,7 @@ export const authenticateMentorRegistration = async (data) => {
 
 export const authenticateMentorLogin = async (data) => {
     try {
-        data.email = data.email.toLowerCase();
+        // data.email = data.email.toLowerCase();
         return await axios.post(`${URL}/loginmentor`, data);
 
     } catch (error) {
@@ -53,12 +53,61 @@ export const authenticateMentorLogin = async (data) => {
 
 export const sendRatingAndReview = async (data) => {
     try {
+        console.log("rating api", data);
         return await axios.post(`${URL}/ratingandreview`, data);
 
     } catch (error) {
         console.log("error", error)
     }
 }
+
+export const sendConnection = async (id, studentDetails, studentQuery) => {
+    try {
+        console.log("rating api", id, studentDetails, studentQuery);
+        return await axios.post(`${URL}/mentordetials/sendconnection`, { id, studentDetails, studentQuery });
+
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+
+export const fetchConnectionStatus = async (studentId, studentObjectId, mentorId) => {
+    try {
+        console.log("connection status api", studentId, studentObjectId, mentorId);
+        return await axios.post(`${URL}/mentor/dashboard/fetchconnectionstatus`, { studentId, studentObjectId, mentorId });
+
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+
+export const fetchClassesByMentorId = async (mentorId) => {
+    try {
+        return await axios.post(`${URL}/mentor/dashboard/fetchclassesbymentorid`, { mentorId });
+
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+
+export const changeClassStatus = async (studentObjectId, mentorId) => {
+    try {
+        console.log("api", studentObjectId, mentorId)
+        return await axios.post(`${URL}/mentor/dashboard/classes/changeclassstatus`, { studentObjectId, mentorId });
+
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+// export const fetchMentorConnections = async (id) => {
+//     try {
+//         console.log(id)
+//         return await axios.post(`${URL}/mentor/dashboard/fetchconnections`, { id });
+
+//     } catch (error) {
+//         console.log("error", error)
+//     }
+// }
 
 // export const paymentToMentor = async (data) => {
 //     try {

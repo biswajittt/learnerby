@@ -81,17 +81,7 @@ const mentorSchema = new mongoose.Schema({
         min: 1,
         max: 5
     },
-    ratingandreview: {
-        userid: {
-            type: String,
-        },
-        ratingvalue: {
-            type: String,
-        },
-        reviewtext: {
-            type: String,
-        }
-    },
+
     password: {
         type: String,
         require: true,
@@ -121,7 +111,7 @@ const mentorSchema = new mongoose.Schema({
             type: String,
             require: true,
             default: 'none'
-        }
+        },
     },
     created_on: {
         type: Number,

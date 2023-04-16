@@ -64,11 +64,12 @@ export const getMentorDetails = (id) => async (dispatch) => {
 
 export const getMentorsDataBySearchQuery = (searchQuery) => async (dispatch) => {
     try {
-        // console.log("from action: ", searchQuery)
+        console.log("from action: ", searchQuery)
         // console.log(`${URL}/searchpage/searchquery/${searchQuery['searchquery']}`)
         dispatch({ type: actionTypes.GET_MENTOR_DETIAL_BY_SEARCH_QUERY_REQUEST });
 
-        const { data } = await axios.get(`${URL}/searchpage/searchquery/${searchQuery['searchquery']}`);
+        const { data } = await axios.get(`${URL}/searchpage/searchquery/${searchQuery}`);
+
         dispatch({
             type: actionTypes.GET_MENTOR_DETIAL_BY_SEARCH_QUERY_REQUEST_SUCCESS,
             payload: data

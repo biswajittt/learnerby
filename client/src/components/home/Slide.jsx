@@ -5,12 +5,12 @@ import 'react-multi-carousel/lib/styles.css'
 import { homeNavData } from './constants/data';
 import TagFacesIcon from '@mui/icons-material/TagFaces';
 import { width } from '@mui/system';
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 const responsive = {
     desktop: {
         breakpoint: { max: 3000, min: 1024 },
-        items: 5
+        items: 6
     },
     laptop: {
         breakpoint: { max: 1024, min: 745 },
@@ -115,7 +115,14 @@ const MentorCard = styled(Box)`
 export default function Slide(props) {
     // console.log("from slide", props.mentors)
     console.log("props: ", props.mentors)
-    console.log()
+    // console.log()
+    const navigate = useNavigate();
+    const handleViewAll = (searchquery) => {
+        searchquery = searchquery.toLowerCase();
+        navigate("/searchpage/searchquery/" + searchquery)
+    }
+
+
     return (
         <>
             {
@@ -124,11 +131,19 @@ export default function Slide(props) {
                         <Subject>
                             {
                                 (props.type == "Teaching Mode") ?
-                                    <Typography>{props.type + ": " + props.title}</Typography> :
-                                    <Typography>{props.title}</Typography>
+                                    <Stack direction='row'>
+                                        <Typography sx={{ fontSize: '17px', fontWeight: '600' }}>{props.type}</Typography>
+                                        <Typography sx={{ marginTop: '1px', fontSize: '17px' }}>{" : " + props.title}</Typography>
+                                    </Stack> :
+
+
+                                    <>
+                                        <Typography sx={{ fontSize: '17px', fontWeight: '600' }}>{props.title}</Typography>
+                                        <ViewAllButton variant='contained' size='small' sx={{ background: '#2b2b2b' }} onClick={() => handleViewAll(props.title)}>View all</ViewAllButton>
+                                    </>
                             }
 
-                            <ViewAllButton variant='contained' size='small'>View all</ViewAllButton>
+
                         </Subject>
                         <Divider />
                         <Carousel
@@ -170,6 +185,24 @@ export default function Slide(props) {
                             itemClass='carousel-item-padding-40-px' containerClass='carousel-container'
                         >
                             <Stack sx={{ margin: '27px 4px 24px 4px' }} direction='row' spacing={4}>
+                                <Paper sx={{ width: '195px', height: '205px' }}>
+                                    <Box sx={{ padding: "7px 7px 0px 7px" }}>
+                                        <Skeleton variant="rounded" animation="wave" sx={{ width: '180px', height: '123px' }} />
+
+                                        <Skeleton variant="rounded" animation="wave" sx={{ marginTop: '10px', width: '142px', height: '9px' }} />
+                                        <Skeleton variant="rounded" animation="wave" sx={{ marginTop: '10px', width: '175px', height: '16px' }} />
+                                        <Skeleton variant="rounded" animation="wave" sx={{ marginTop: '10px', width: '82px', height: '17px' }} />
+                                    </Box>
+                                </Paper>
+                                <Paper sx={{ width: '195px', height: '205px' }}>
+                                    <Box sx={{ padding: "7px 7px 0px 7px" }}>
+                                        <Skeleton variant="rounded" animation="wave" sx={{ width: '180px', height: '123px' }} />
+
+                                        <Skeleton variant="rounded" animation="wave" sx={{ marginTop: '10px', width: '142px', height: '9px' }} />
+                                        <Skeleton variant="rounded" animation="wave" sx={{ marginTop: '10px', width: '175px', height: '16px' }} />
+                                        <Skeleton variant="rounded" animation="wave" sx={{ marginTop: '10px', width: '82px', height: '17px' }} />
+                                    </Box>
+                                </Paper>
                                 <Paper sx={{ width: '195px', height: '205px' }}>
                                     <Box sx={{ padding: "7px 7px 0px 7px" }}>
                                         <Skeleton variant="rounded" animation="wave" sx={{ width: '180px', height: '123px' }} />

@@ -33,7 +33,7 @@ const paymentToMentor = async (req, res) => {
             // console.log(req.body.mentorId)
             // console.log(typeof req.body.mentorId)
             if (exist) {
-                console.log("inside exist", exist._id)
+                // console.log("inside exist", exist._id)
 
                 const result = await BookedClass.findByIdAndUpdate(
                     { '_id': exist._id },
@@ -97,7 +97,7 @@ const paymentToMentor = async (req, res) => {
                 });
                 const result = await newBookedClassData.save()
                 console.log(result)
-                res.status(200).json({ dataAfterBookingClass: result });
+                return res.status(200).json({ dataAfterBookingClass: result });
             }
 
 
@@ -129,13 +129,53 @@ const paymentToMentor = async (req, res) => {
             // // res.send("Payment Success", result);
             // return res.status(200).json({ result });
         } else {
-            res.send("Payment Failed");
+            return res.send("Payment Failed");
         }
     } catch (error) {
-        res.status(400).json({
+        return res.status(400).json({
             message: 'Something went worng',
             error: error.stack
         });
     }
 }
-module.exports = { paymentToMentor }
+
+const getClassesByMentorId = async (req, res) => {
+    try {
+        const { mentorId } = req.body;
+
+        const classDetails = await BookedClass.find({ 'mentorId': mentorId });
+        // console.log("mentors", classDetails)
+        return res.status(200).json(classDetails)
+    } catch (error) {
+        return res.status(400).json({ message: error.message })
+    }
+}
+
+const changeClassStatus = async (req, res) => {
+    try {
+        const { studentObjectId, mentorId } = req.body;
+
+        // const classDetails = await BookedClass.find({ 'mentorId': mentorId });
+        // console.log("mentors", classDetails)
+        let sObjectId = mongoose.Types.ObjectId(studentObjectId)
+        // console.log(sObjectId)
+        const result = await BookedClass.updateOne(
+            { 'mentorId': mentorId, 'bookedClasses._id': sObjectId, },
+            // {
+            //     'mentorId': mentorId,
+            //     "bookedClasses": { "$elemMatch": { "_id": sObjectId } }
+            // },
+            {
+                $set: {
+                    'bookedClasses.bookedClassDetails.$.classCompleted': "Completed"
+                }
+            },
+            { new: true }
+        )
+        console.log("result", result)
+        // return res.status(200).json(classDetails)
+    } catch (error) {
+        return res.status(400).json({ message: error.message })
+    }
+}
+module.exports = { paymentToMentor, getClassesByMentorId, changeClassStatus }

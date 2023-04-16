@@ -29,8 +29,8 @@ const mentorRegistration = async (req, res) => {
         console.log("from mscheme: ", mentor)
         const newMentor = new Mentor(mentor);
         await newMentor.save()
-
-        res.status(200).json({ data: mentor });
+        console.log("new mentor from mscheme: ", newMentor)
+        res.status(200).json({ data: newMentor });
     } catch (error) {
         res.status(500).json({ message: error.message });
         console.log(error)
@@ -40,14 +40,15 @@ const mentorRegistration = async (req, res) => {
 const mentorLogin = async (req, res) => {
     const mentorEmail = req.body.email;
     const password = req.body.password;
+
     if (!mentorEmail || !password) {
         return res.status(422).json({ error: "Please fill the required fields" });
     }
     try {
         let mentorLoginData = await Mentor.findOne({ email: mentorEmail });
-
+        // console.log(mentorLoginData)
         const isMatch = await bcrypt.compare(password, mentorLoginData.password);
-
+        // console.log(isMatch)
         if (isMatch) {
             //generating token
             const token = await mentorLoginData.generateAuthToken();
@@ -58,11 +59,15 @@ const mentorLogin = async (req, res) => {
             });
             return res.status(200).json({ message: "Mentor login successful", data: mentorLoginData });
         } else {
+            // console.log(mentorEmail, password)
             return res.status(401).json("Invalid login");
         }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.log("sdsdsdsd", mentorEmail, password)
         console.log(error)
+        console.log(error.response)
+        return res.status(500).json({ message: error.message });
+
     }
 }
 
@@ -133,7 +138,7 @@ const saveRatingReviewData = async (req, res) => {
 
 
         // const localData = localStorage.getItem('accountHolderData');
-        console.log("from contro", req.body)
+        // console.log("from contro", req.body)
         const result = await Mentor.findByIdAndUpdate({ '_id': req.body.mentorId }, {
             $set: {
                 ratingandreview: {
