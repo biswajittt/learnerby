@@ -138,7 +138,7 @@ export default function CustomeButton() {
                                 sx={{ background: '#e8e8e8', padding: "6px 14px 5px 14px", borderRadius: '10px' }}
                             >
                                 <DashBoardText>
-                                    DASHBORAD
+                                    DASHBOARD
                                 </DashBoardText>
                             </MenuButton>
                             <Menu
