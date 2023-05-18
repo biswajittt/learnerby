@@ -401,11 +401,11 @@ export default function MentorLoginDialog(props) {
                             account.view === "login" ?
 
                                 <RightContainer>
-                                    <TextField variant='standard' name='email' onChange={(event) => { onInputChangeOnLogin(event) }} label='Enter Email/Phone Number' />
+                                    <TextField variant='standard' name='email' type='email' onChange={(event) => { onInputChangeOnLogin(event) }} label='Enter Email/Phone Number' />
 
 
 
-                                    <TextField variant='standard' name='password' onChange={(event) => { onInputChangeOnLogin(event) }} label='Enter Password' />
+                                    <TextField variant='standard' name='password' type='password' onChange={(event) => { onInputChangeOnLogin(event) }} label='Enter Password' />
                                     {/* <TermsConditionText>By continuing, you agree to Learnerby`s terms of use and privacy policy</TermsConditionText> */}
                                     {(error.errorAvailable) && <Error>{error.errorText}</Error>}
                                     <LoginButton onClick={() => { loginMentor() }} disabled={loginButton.isClicked}>
@@ -485,7 +485,7 @@ export default function MentorLoginDialog(props) {
                                                 </FormControl>
                                                 <TextField variant='standard' name='priceperhour' value={registrationData.priceperhour} onChange={(event) => { onInputChangeOnRegistration(event) }} label='Enter Price Per Hour' />
                                                 <TextField variant='standard' name='priceperday' value={registrationData.priceperday} onChange={(event) => { onInputChangeOnRegistration(event) }} label='Enter Price Per Day' />
-                                                <TextField variant='standard' name='password' value={registrationData.password} onChange={(event) => { onInputChangeOnRegistration(event) }} label='Enter Password' />
+                                                <TextField variant='standard' name='password' type='password' value={registrationData.password} onChange={(event) => { onInputChangeOnRegistration(event) }} label='Enter Password' />
                                             </Stack>
 
                                     }
