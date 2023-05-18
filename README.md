@@ -1,7 +1,5 @@
 <h1 align="center">Learnerby - find your mentor</h1>
-<!-- <p align="center"><a><img src="Screenshots/1.png" width="600"></a></p> -->
-# LEARNERBY:
-LEARNERBY is a mentor finding web application built using MERN stack technology
+<h6 align="center">LEARNERBY is a mentor finding web application built using MERN stack technology</h6>
 
 ---
 
@@ -15,7 +13,7 @@ LEARNERBY is a mentor finding web application built using MERN stack technology
 
 <a name="item1"></a>
 
-## IUT Search Bot Overview:
+## Learnerby Overview:
 
 <h3>
 LEARNERBY is web application where user can find mentors, user can book classes whenever they need and after payment they can start classes.
@@ -52,7 +50,7 @@ Run the client and server by using npm start
 
 ## Screenshots:
 
-![](Screenshots/1.png)
+(Screenshots/1.png)
 ![](Screenshots/2.png)
 ![](Screenshots/3.png)
 ![](Screenshots/4.png)
