@@ -50,7 +50,7 @@ Run the client and server by using npm start
 
 ## Screenshots:
 
-![](Screenshots/1.png?raw=true "Optional Title")
+![](/Screenshots/1.png?raw=true "Optional Title")
 ![](Screenshots/2.png)
 ![](Screenshots/3.png)
 ![](Screenshots/4.png)
